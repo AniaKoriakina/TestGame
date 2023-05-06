@@ -13,55 +13,70 @@ namespace MyRoguelite
     {
         public event EventHandler<GameplayEventArgs> Updated = delegate { };
 
-        private static Vector2 _pos = new Vector2(900, 500);
+    //    private static Vector2 _pos = new Vector2(900, 500);
+        public int PlayerId { get; set; }
+
+        public Dictionary<int, IObject> Objects { get; set; }
 
         public void Update()
         {
-            Updated.Invoke(this, new GameplayEventArgs { PlayerPos = _pos });
+            Updated.Invoke(this, new GameplayEventArgs { Objects = this.Objects });
         }
 
-        public void MovePlayer(IModel.Direction dir, int playerSpeed)
+        public void Initialize()
         {
+            Objects = new Dictionary<int, IObject>();
+            Player player = new Player();
+            player.Pos = new Vector2(900, 500);
+            player.ImageId = 1;
+            player.Speed = 7;
+            Objects.Add(1, player);
+            PlayerId = 1;
+        }
+
+        public void MovePlayer(IModel.Direction dir)
+        {
+            Player p = (Player)Objects[PlayerId];
             switch (dir)
             {
                 case IModel.Direction.up:
                     {
-                        _pos += new Vector2(0, -playerSpeed);
+                        p.Pos += new Vector2(0, -p.Speed);
                         break;
                     }
                 case IModel.Direction.down:
                     {
-                        _pos += new Vector2(0, playerSpeed);
+                        p.Pos += new Vector2(0, p.Speed);
                         break;
                     }
                 case IModel.Direction.right:
                     {
-                        _pos += new Vector2(playerSpeed, 0);
+                        p.Pos += new Vector2(p.Speed, 0);
                         break;
                     }
                 case IModel.Direction.left:
                     {
-                        _pos += new Vector2(-playerSpeed, 0);
+                        p.Pos += new Vector2(-p.Speed, 0);
                         break;
                     }
                 case IModel.Direction.upRight:
                     {
-                        _pos += new Vector2(playerSpeed - 2, -playerSpeed + 2);
+                        p.Pos += new Vector2(p.Speed - 2, -p.Speed + 2);
                         break;
                     }
                 case IModel.Direction.upLeft:
                     {
-                        _pos += new Vector2(-playerSpeed + 2, -playerSpeed + 2);
+                        p.Pos += new Vector2(-p.Speed + 2, -p.Speed + 2);
                         break;
                     }
                 case IModel.Direction.downRight:
                     {
-                        _pos += new Vector2(playerSpeed - 2, playerSpeed - 2);
+                        p.Pos += new Vector2(p.Speed - 2, p.Speed - 2);
                         break;
                     }
                 case IModel.Direction.downLeft:
                     {
-                        _pos += new Vector2(-playerSpeed + 2, playerSpeed - 2);
+                        p.Pos += new Vector2(-p.Speed + 2, p.Speed - 2);
                         break;
                     }
 

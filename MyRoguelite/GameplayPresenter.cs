@@ -19,17 +19,18 @@ namespace MyRoguelite
             _gameplayView.CycleFinished += ViewModelUpdate; // событие вызывается, когда игровой цикл завершается 
             _gameplayView.PlayerMoved += ViewModelMovePlayer; //событие вызывается, когда игрок двигается
             _gameplayModel.Updated += ModelViewUpdate; //событие вызывается, когда игровое состояние обновляется
+            _gameplayModel.Initialize();
 
         }
 
         private void ViewModelMovePlayer(object sender, ControlsEventArgs e) 
         {
-            _gameplayModel.MovePlayer(e.Direction, 7);
+            _gameplayModel.MovePlayer(e.Direction);
         }
 
         private void ModelViewUpdate(object sender, GameplayEventArgs e)
         {
-            _gameplayView.LoadParameters(e.PlayerPos);
+            _gameplayView.LoadGCParameters(e.Objects);
         }
 
         private void ViewModelUpdate(object sender, EventArgs e)

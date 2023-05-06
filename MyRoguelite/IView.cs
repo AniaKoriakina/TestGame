@@ -12,7 +12,8 @@ namespace MyRoguelite
         event EventHandler CycleFinished; //событие, которое генерируется, когда цикл игры закончен. вызывается, когда цикл закончен
         event EventHandler<ControlsEventArgs> PlayerMoved; //событие, которое генерируется, когда игрок двигается в каком-либо направлении. 
 
-        void LoadParameters(Vector2 pos); //загружает параметры игры.
+        void LoadGCParameters(Dictionary<int, IObject> objects);
+      //  void LoadParameters(Vector2 pos); //загружает параметры игры.
                                           //Он принимает Vector2 в качестве параметра, который представляет позицию в игре.
         void Run();
     }

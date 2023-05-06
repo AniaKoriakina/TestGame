@@ -1,0 +1,44 @@
+{
+  "textureAtlas": {
+    "texture": "AllframesPlayer.png",
+    "regionWidth": 135,
+    "regionHeight": 135
+  },
+  "cycles": {
+    "moveLeft": {
+      "frames": [0,1,2,3,4,5],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "moveRight": {
+      "frames": [11,10,9,8,7,6],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "moveUp": {
+      "frames": [27,21],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "moveDown": {
+      "frames": [26,20],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "idle": {
+      "frames": [26],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "beatLeft": {
+      "frames": [13,15],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "beatRight": {
+      "frames": [12,16],
+      "isLooping": false,
+      "frameDuration": 0.2
+    }
+  }
+}
