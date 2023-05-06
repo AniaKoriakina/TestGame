@@ -8,6 +8,7 @@ using MonoGame.Extended.Sprites;
 using MonoGame.Extended.Timers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Windows.Input;
 
@@ -150,9 +151,15 @@ namespace MyRoguelite
                             }
                     }
                 }    
-                _moveSprite.Play(animation);
-                _moveSprite.Update(deltaSeconds);
+                
+            } 
+            else
+            {
+                animation = "idle";
+                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.None });
             }
+            _moveSprite.Play(animation);
+            _moveSprite.Update(deltaSeconds);
         } 
 
         protected override void Draw(GameTime gameTime)

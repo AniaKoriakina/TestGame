@@ -79,6 +79,10 @@ namespace MyRoguelite
                         p.Pos += new Vector2(-p.Speed + 2, p.Speed - 2);
                         break;
                     }
+                case IModel.Direction.None:
+                    {
+                        break;
+                    }
 
             }
         }

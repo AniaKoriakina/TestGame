@@ -17,11 +17,9 @@ namespace MyRoguelite
         event EventHandler<GameplayEventArgs> Updated; //событие, которое генерируется, когда происходит обновление игры.
                                                        //генерируется с помощью GameplayEventArgs, которое определяет позицию игрока. 
 
-        void Update();  //обновляет состояние игры
-        void MovePlayer(Direction dir); //перемещает игрока в заданном направлении.
+        void Update(); 
+        void MovePlayer(Direction dir);
         void Initialize();
-
-        //Он принимает Direction в качестве параметра, чтобы определить, в каком направлении двигаться.
 
         public enum Direction : byte // это перечисление, которое определяет восемь возможных направлений, в которых игрок может двигаться.
         {
@@ -32,7 +30,8 @@ namespace MyRoguelite
             upLeft,
             upRight,
             downLeft,
-            downRight
+            downRight,
+            None
         }
     }
 

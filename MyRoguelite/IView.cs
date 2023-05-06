@@ -9,8 +9,8 @@ namespace MyRoguelite
 {
     public interface IView
     {
-        event EventHandler CycleFinished; //событие, которое генерируется, когда цикл игры закончен. вызывается, когда цикл закончен
-        event EventHandler<ControlsEventArgs> PlayerMoved; //событие, которое генерируется, когда игрок двигается в каком-либо направлении. 
+        event EventHandler CycleFinished; //событие, когда цикл закончен
+        event EventHandler<ControlsEventArgs> PlayerMoved; //событие, когда игрок двигается в каком-либо направлении. 
 
         void LoadGCParameters(Dictionary<int, IObject> objects);
       //  void LoadParameters(Vector2 pos); //загружает параметры игры.
