@@ -37,7 +37,7 @@ namespace MyRoguelite
 
     public class GameplayEventArgs : EventArgs //определяет, какие данные будут отправлены в событии Updated
     {
-        public Vector2 PlayerPos { get; set; } //свойство, которое представляет позицию игрока в игровой среде.
+       // public Vector2 PlayerPos { get; set; } 
         public Dictionary<int, IObject> Objects { get; set; }
     }
 }
