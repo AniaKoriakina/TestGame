@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyRoguelite.Objects;
 
 namespace MyRoguelite
 {
@@ -61,22 +62,22 @@ namespace MyRoguelite
                     }
                 case IModel.Direction.upRight:
                     {
-                        p.Pos += new Vector2(p.Speed - 2, -p.Speed + 2);
+                        p.Pos += new Vector2(p.Speed - 3, -p.Speed + 3);
                         break;
                     }
                 case IModel.Direction.upLeft:
                     {
-                        p.Pos += new Vector2(-p.Speed + 2, -p.Speed + 2);
+                        p.Pos += new Vector2(-p.Speed + 3, -p.Speed + 3);
                         break;
                     }
                 case IModel.Direction.downRight:
                     {
-                        p.Pos += new Vector2(p.Speed - 2, p.Speed - 2);
+                        p.Pos += new Vector2(p.Speed - 3, p.Speed - 3);
                         break;
                     }
                 case IModel.Direction.downLeft:
                     {
-                        p.Pos += new Vector2(-p.Speed + 2, p.Speed - 2);
+                        p.Pos += new Vector2(-p.Speed + 3, p.Speed - 3);
                         break;
                     }
                 case IModel.Direction.None:

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyRoguelite
+namespace MyRoguelite.Objects
 {
     internal class Player : IObject
     {
@@ -15,7 +15,7 @@ namespace MyRoguelite
 
         public void Update()
         {
-            
+
         }
     }
 }

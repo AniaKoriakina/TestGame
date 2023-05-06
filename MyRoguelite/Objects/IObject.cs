@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyRoguelite
+namespace MyRoguelite.Objects
 {
     public interface IObject
     {

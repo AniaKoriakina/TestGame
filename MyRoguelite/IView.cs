@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using MyRoguelite.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;

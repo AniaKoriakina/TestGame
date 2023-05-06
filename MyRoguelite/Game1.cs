@@ -6,6 +6,7 @@ using MonoGame.Extended.Content;
 using MonoGame.Extended.Serialization;
 using MonoGame.Extended.Sprites;
 using MonoGame.Extended.Timers;
+using MyRoguelite.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -88,63 +89,28 @@ namespace MyRoguelite
             var keys = Keyboard.GetState().GetPressedKeys();
             var deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var animation = "idle";
-            if (keys.Length > 0)
+            bool isWPressed = keys.Contains(Keys.W);
+            bool isSPressed = keys.Contains(Keys.S);
+            bool isDPressed = keys.Contains(Keys.D);
+            bool isAPressed = keys.Contains(Keys.A);
+            bool isEscPressed = keys.Contains(Keys.Escape);
+            var directionKey = (isWPressed, isAPressed, isSPressed, isDPressed);
+            var moveDirections = new Dictionary<(bool, bool, bool, bool), (string, IModel.Direction)> {
+                { (false, false, true, true), ("moveRight", IModel.Direction.downRight) },
+                { (true, true, false, false), ("moveLeft", IModel.Direction.upLeft) },
+                { (false, true, true, false), ("moveLeft", IModel.Direction.downLeft) },
+                { (true, false, false, true), ("moveRight", IModel.Direction.upRight) },
+                { (true, false, false, false), ("moveUp", IModel.Direction.up) },
+                { (false, false, true, false), ("moveDown", IModel.Direction.down) },
+                { (false, true, false, false), ("moveLeft", IModel.Direction.left) },
+                { (false, false, false, true),("moveRight", IModel.Direction.right) }};
+
+            if (moveDirections.TryGetValue(directionKey, out var moveDirection))
             {
-                bool isWPressed = keys.Contains(Keys.W);
-                bool isSPressed = keys.Contains(Keys.S);
-                bool isDPressed = keys.Contains(Keys.D);
-                bool isAPressed = keys.Contains(Keys.A);
-                bool isEscPressed = keys.Contains(Keys.Escape);
-                if (isWPressed && isDPressed && !isAPressed && !isSPressed)
-                {
-                    animation = "moveRight";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.upRight });
-                }
-                else if (isWPressed && isAPressed && !isDPressed && !isSPressed)
-                {
-                    animation = "moveLeft";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.upLeft });
-                }
-                else if (isSPressed && isAPressed && !isDPressed && !isWPressed)
-                {
-                    animation = "moveLeft";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.downLeft });
-                }
-                else if (isSPressed && isDPressed && !isAPressed && !isWPressed)
-                {
-                    animation = "moveRight";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.downRight });
-                }
-                else if (!isAPressed && !isDPressed && isWPressed && !isSPressed)
-                {
-                    animation = "moveUp";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.up });
-                } 
-                else if (!isAPressed && !isDPressed && !isWPressed && isSPressed)
-                {
-                    animation = "moveDown";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.down });
-                }
-                else if (!isAPressed && isDPressed && !isWPressed && !isSPressed)
-                {
-                    animation = "moveRight";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.right });
-                }
-                else if (isAPressed && !isDPressed && !isWPressed && !isSPressed) 
-                {
-                    animation = "moveLeft";
-                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.left });
-                }
-                else if (isEscPressed)
-                {
-                    Exit();
-                }                
-            } 
-            else
-            {
-                animation = "idle";
-                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.None });
+                animation = moveDirection.Item1;
+                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = moveDirection.Item2 });
             }
+
             _moveSprite.Play(animation);
             _moveSprite.Update(deltaSeconds);
         } 
