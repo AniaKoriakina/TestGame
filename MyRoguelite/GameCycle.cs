@@ -62,22 +62,22 @@ namespace MyRoguelite
                     }
                 case IModel.Direction.upRight:
                     {
-                        p.Pos += new Vector2(p.Speed - 3, -p.Speed + 3);
+                        p.Pos += new Vector2(p.Speed - 2, -p.Speed + 2);
                         break;
                     }
                 case IModel.Direction.upLeft:
                     {
-                        p.Pos += new Vector2(-p.Speed + 3, -p.Speed + 3);
+                        p.Pos += new Vector2(-p.Speed + 2, -p.Speed + 2);
                         break;
                     }
                 case IModel.Direction.downRight:
                     {
-                        p.Pos += new Vector2(p.Speed - 3, p.Speed - 3);
+                        p.Pos += new Vector2(p.Speed - 2, p.Speed - 2);
                         break;
                     }
                 case IModel.Direction.downLeft:
                     {
-                        p.Pos += new Vector2(-p.Speed + 3, p.Speed - 3);
+                        p.Pos += new Vector2(-p.Speed + 2, p.Speed - 2);
                         break;
                     }
                 case IModel.Direction.None:
