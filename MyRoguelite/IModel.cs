@@ -30,8 +30,6 @@ namespace MyRoguelite
             downLeft,
             downRight
         }
-
-
     }
 
     public class GameplayEventArgs : EventArgs //определяет, какие данные будут отправлены в событии Updated

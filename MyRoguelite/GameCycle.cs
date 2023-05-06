@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using MonoGame.Extended.Content;
+using MonoGame.Extended.Sprites;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +13,7 @@ namespace MyRoguelite
     {
         public event EventHandler<GameplayEventArgs> Updated = delegate { };
 
-        private Vector2 _pos = new Vector2(900, 500);
-
+        private static Vector2 _pos = new Vector2(900, 500);
 
         public void Update()
         {
