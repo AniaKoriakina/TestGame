@@ -94,6 +94,7 @@ namespace MyRoguelite
                 bool isSPressed = keys.Contains(Keys.S);
                 bool isDPressed = keys.Contains(Keys.D);
                 bool isAPressed = keys.Contains(Keys.A);
+                bool isEscPressed = keys.Contains(Keys.Escape);
                 if (isWPressed && isDPressed && !isAPressed && !isSPressed)
                 {
                     animation = "moveRight";
@@ -114,44 +115,30 @@ namespace MyRoguelite
                     animation = "moveRight";
                     PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.downRight });
                 }
-                else 
+                else if (!isAPressed && !isDPressed && isWPressed && !isSPressed)
                 {
-                    var k = keys[0];
-                    switch (k)
-                    {
-                        case Keys.W:
-                            {
-                                animation = "moveUp";
-                                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.up });
-                                break;
-                            }
-                        case Keys.S:
-                            {
-                                animation = "moveDown";
-                                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.down });
-                                break;
-                            }
-                        case Keys.D:
-                            {
-                                animation = "moveRight";
-                                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.right });
-                                break;
-                            }
-                        case Keys.A:
-                            {
-                                animation = "moveLeft";
-                                PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.left });
-                                break;
-                            }
-
-                        case Keys.Escape:
-                            {
-                                Exit();
-                                break;
-                            }
-                    }
-                }    
-                
+                    animation = "moveUp";
+                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.up });
+                } 
+                else if (!isAPressed && !isDPressed && !isWPressed && isSPressed)
+                {
+                    animation = "moveDown";
+                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.down });
+                }
+                else if (!isAPressed && isDPressed && !isWPressed && !isSPressed)
+                {
+                    animation = "moveRight";
+                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.right });
+                }
+                else if (isAPressed && !isDPressed && !isWPressed && !isSPressed) 
+                {
+                    animation = "moveLeft";
+                    PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = IModel.Direction.left });
+                }
+                else if (isEscPressed)
+                {
+                    Exit();
+                }                
             } 
             else
             {
