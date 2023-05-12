@@ -1,0 +1,14 @@
+{
+  "textureAtlas": {
+    "texture": "enemyObj.png",
+    "regionWidth": 135,
+    "regionHeight": 137
+  },
+  "cycles": {
+    "enemySprite": {
+      "frames": [0],
+      "isLooping": false,
+      "frameDuration": 0.2
+    }
+  }
+}

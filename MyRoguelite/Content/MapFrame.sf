@@ -1,0 +1,54 @@
+{
+  "textureAtlas": {
+    "texture": "MapFrame.png",
+    "regionWidth": 137,
+    "regionHeight": 135
+  },
+  "cycles": {
+    "leftUpCorner": {
+      "frames": [0],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "rightUpCorner": {
+      "frames": [13],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "rightDownCorner": {
+      "frames": [111],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "leftDownCorner": {
+      "frames": [98],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "downWall": {
+      "frames": [103],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "upWall": {
+      "frames": [4],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "leftWall": {
+      "frames": [56],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "rightWall": {
+      "frames": [55],
+      "isLooping": false,
+      "frameDuration": 0.2
+    },
+    "floor": {
+      "frames": [65],
+      "isLooping": false,
+      "frameDuration": 0.2
+    }
+  }
+}

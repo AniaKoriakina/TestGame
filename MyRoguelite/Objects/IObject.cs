@@ -10,7 +10,8 @@ namespace MyRoguelite.Objects
     public interface IObject
     {
         int ImageId { get; set; }
-        Vector2 Pos { get; }
+        Vector2 Pos { get; set; }
+        int Speed { get; set; }
         void Update();
     }
 }

@@ -1,0 +1,14 @@
+{
+  "textureAtlas": {
+    "texture": "underManBlack.png",
+    "regionWidth": 135,
+    "regionHeight": 137
+  },
+  "cycles": {
+    "animation0": {
+      "frames": [0],
+      "isLooping": false,
+      "frameDuration": 0.2
+    }
+  }
+}

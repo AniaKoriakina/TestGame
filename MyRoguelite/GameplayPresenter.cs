@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MyRoguelite.Model;
+using MyRoguelite.View;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,7 @@ namespace MyRoguelite
         private IView _gameplayView = null;
         private IModel _gameplayModel = null;
 
-        public GameplayPresenter(IView gameplayView, IModel gameplayModel) 
+        public GameplayPresenter(IView gameplayView, IModel gameplayModel)
         {
             _gameplayView = gameplayView;
             _gameplayModel = gameplayModel;
@@ -23,14 +25,14 @@ namespace MyRoguelite
 
         }
 
-        private void ViewModelMovePlayer(object sender, ControlsEventArgs e) 
+        private void ViewModelMovePlayer(object sender, ControlsEventArgs e)
         {
             _gameplayModel.MovePlayer(e.Direction);
         }
 
         private void ModelViewUpdate(object sender, GameplayEventArgs e)
         {
-            _gameplayView.LoadGCParameters(e.Objects);
+            _gameplayView.LoadGCParameters(e.Objects, e.POVShift);
         }
 
         private void ViewModelUpdate(object sender, EventArgs e)
