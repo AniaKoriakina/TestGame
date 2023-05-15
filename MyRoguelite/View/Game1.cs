@@ -33,13 +33,7 @@ namespace MyRoguelite.View
         private Dictionary<int, IObject> _objects = new Dictionary<int, IObject>();
         private Dictionary<int, AnimatedSprite> _textures = new Dictionary<int, AnimatedSprite>();
 
-
-        //  int frameWidth = 95;
-        //  int frameHeight = 120;
-        //  Point currentFrame = new Point(0, 0);
-        //  Point spriteSizeMoveLeft = new Point(6, 1);
-        //  Texture2D texture;
-
+        public static SpriteFont Font { get; set; }
 
         public Game1()
         {
@@ -82,6 +76,7 @@ namespace MyRoguelite.View
             _enemySprite = enemySprite;
             _textures.Add(3, _enemySprite);
 
+            Font = Content.Load<SpriteFont>("Health");
 
             //Song backgroundMusic = Content.Load<Song>("backgroundMusic");
             //MediaPlayer.IsRepeating = true;
@@ -143,6 +138,7 @@ namespace MyRoguelite.View
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+            _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(800, 400), Color.White);
 
             foreach (var o in _objects.Values)
             {

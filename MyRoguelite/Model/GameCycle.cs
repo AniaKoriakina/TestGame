@@ -27,36 +27,44 @@ namespace MyRoguelite.Model
 
         public Dictionary<int, IObject> Objects { get; set; }
 
+        private Player LiteralyPlayer { get; set; }
+
+
+        public static string HealthText { get; set; }
+
         public void Update()
         {
-            Vector2 playerInitPos = Objects[PlayerId].Pos;
-            for (int i = 1; i <= Objects.Keys.Count; i++)
+            foreach (var obj in Objects)
             {
-                Vector2 objInitPos = Objects[i].Pos;
-                Objects[i].Update();
-                if (Objects[i] is Player p1 && objInitPos != Objects[i].Pos)
+                Objects[obj.Key].Update();
+            }
+
+            LiteralyPlayer.Update();
+
+            foreach (var obj in Objects)
+            {
+                if (obj.Value is Enemy enemy)
                 {
-                    for (int j = 1; j <= Objects.Keys.Count; j++)
+                    if (Collider.IsCollided(LiteralyPlayer.Collider, enemy.Collider))
                     {
-                        if (i == j)
-                            continue;
-                        if (Objects[j] is ISolid p2)
+                        LiteralyPlayer.Health -= 0.1f;
+                        HealthText = Math.Round(LiteralyPlayer.Health).ToString();
+                        if (LiteralyPlayer.Health < 0)
                         {
-                            while (Collider.IsCollided(p1.Collider, p2.Collider))
-                            {
-                                Objects[i].Pos = objInitPos;
-                                p1.MoveCollider(Objects[i].Pos);
-                            }
+                            LiteralyPlayer.IsDead();
                         }
                     }
                 }
             }
 
-            //  Vector2 playerShift = Objects[PlayerId].Pos - playerInitPos;
+
+            var obj2 = new Dictionary<int, IObject>(Objects)
+            {
+                { PlayerId, LiteralyPlayer }
+            };
             Updated.Invoke(this, new GameplayEventArgs
             {
-                Objects = Objects,
-
+                Objects = obj2,
             });
         }
 
@@ -133,15 +141,19 @@ namespace MyRoguelite.Model
                 {
                     if (_map[x, y] == 'P')
                     {
-                        Player player = new Player(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2), new Vector2(135,137));
+                        Player player = new Player(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2),
+                            new Vector2(135, 137), 100);
                         player.ImageId = 1;
-                        player.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
+                        player.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2,
+                            y * _tileSizeHeight + _tileSizeHeight / 2);
                         player.Speed = 7;
-                        PlayerId = _currentId;
+                        PlayerId = _currentId++;
 
-                        Objects.Add(_currentId, player);
+
+                        LiteralyPlayer = player;
+                        HealthText = player.Health.ToString();
+                        LiteralyPlayer.Health = player.Health;
                         isPlacedPlayer = true;
-                        _currentId++;
                         break;
                     }
                 }
@@ -157,7 +169,8 @@ namespace MyRoguelite.Model
 
         public void MovePlayer(IModel.Direction dir)
         {
-            Player p = (Player)Objects[PlayerId];
+            Player p = LiteralyPlayer;
+            Vector2 playerInitPos = p.Pos;
             Vector2 newPos = p.Pos;
 
             switch (dir)
@@ -207,18 +220,33 @@ namespace MyRoguelite.Model
                         break;
                     }
             }
-            p.Pos = newPos;
-
-            int x = (int)Math.Floor(newPos.X / _tileSizeWidth);
-            int y = (int)Math.Floor(newPos.Y / _tileSizeHeight);
-
-            if (x >= 0 && x < _map.GetLength(0) && y >= 0 && y < _map.GetLength(1))
+            int x = (int)Math.Round(newPos.X / _tileSizeWidth);
+            int y = (int)Math.Round(newPos.Y / _tileSizeHeight);
+            Collider newCollider = new Collider((int)newPos.X, (int)newPos.Y, (int)p.Size.X, (int)p.Size.Y);
+            bool collided = false;
+            if (playerInitPos != newPos)
             {
-                if (_map[x, y] != 'W')
+                Dictionary<int, ISolid> solidObjects = Objects.Where(i => i.Value is ISolid)
+                    .ToDictionary(i => i.Key, i => (ISolid)i.Value);
+
+                foreach (var solidObject in solidObjects)
                 {
-                    p.Pos = newPos;
+                    if (Collider.IsCollided(newCollider, solidObjects[solidObject.Key].Collider))
+                    {
+                        collided = true;
+                        Vector2 returnVec = new Vector2(p.Pos.X - (playerInitPos.X + 1), p.Pos.Y - (playerInitPos.Y - 1));
+                        p.Pos = newPos - returnVec;
+                        p.MoveCollider(p.Pos - returnVec);
+                    }
                 }
             }
+
+            if (!collided)
+            {
+                p.Pos = newPos;
+                p.MoveCollider(p.Pos);
+            }
+
         }
     }
 }

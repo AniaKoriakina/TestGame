@@ -15,13 +15,26 @@ namespace MyRoguelite.Objects
         public int Speed { get; set; }
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
-        
+        public float Health { get; set; }
+        private bool Alive = true;
 
-        public Player(Vector2 position, Vector2 size) 
+
+        public Player(Vector2 position, Vector2 size, int health) 
         { 
             Pos = position;
             Collider = new Collider((int)Pos.X, (int)Pos.Y, 135, 137);
             Size = size;
+            Health = health;
+        }
+
+        public bool IsDead()
+        {
+            if (Health <= 0)
+            {
+                this.Alive = false;
+                return true;
+            }
+            return false;
         }
 
         public void MoveCollider(Vector2 newPos)
