@@ -28,8 +28,8 @@ namespace MyRoguelite.Model
         public Dictionary<int, IObject> Objects { get; set; }
 
         private Player LiteralyPlayer { get; set; }
-
-
+        private int enemyCount = 0;
+        private int maxEnemyCount = 10;
         public static string HealthText { get; set; }
 
         public void Update()
@@ -48,7 +48,7 @@ namespace MyRoguelite.Model
                     if (Collider.IsCollided(LiteralyPlayer.Collider, enemy.Collider))
                     {
                         LiteralyPlayer.Health -= 0.1f;
-                        HealthText = Math.Round(LiteralyPlayer.Health).ToString();
+                        HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
                         if (LiteralyPlayer.Health < 0)
                         {
                             LiteralyPlayer.IsDead();
@@ -56,6 +56,8 @@ namespace MyRoguelite.Model
                     }
                 }
             }
+
+            if (LiteralyPlayer.IsDead()) { Environment.Exit(0); }
 
 
             var obj2 = new Dictionary<int, IObject>(Objects)
@@ -66,6 +68,8 @@ namespace MyRoguelite.Model
             {
                 Objects = obj2,
             });
+
+            UpdateEnemies();
         }
 
 
@@ -92,29 +96,55 @@ namespace MyRoguelite.Model
 
             // Отрисовка стен
             CreateWall();
+            GenerateEnemies();
 
             // Отрисовка игрока
             if (!isPlacedPlayer)
             {
                 isPlacedPlayer = CleatePlayer(isPlacedPlayer);
-            }
+            }        
+        }
 
-            for (int y = 0; y < _map.GetLength(1); y++)
+        private void GenerateEnemies()
+        {
+            Random random = new Random();
+
+            while (enemyCount < maxEnemyCount)
             {
-                for (int x = 0; x < _map.GetLength(0); x++)
+                int x = random.Next(_map.GetLength(0));
+                int y = random.Next(_map.GetLength(1));
+
+                if (_map[x, y] != 'E' && _map[x, y] != 'W' && _map[x, y] != 'P')
                 {
-                    if (_map[x, y] == 'E')
+                    Enemy enemy = new Enemy(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2), 100);
+                    enemy.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
+                    enemy.ImageId = 3;
+                    enemy.Speed = 1;
+                    Objects.Add(_currentId, enemy);
+                    _currentId++;
+                    enemyCount++;
+
+                    if (enemy.IsDead())
                     {
-                        Enemy e = new Enemy(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2));
-                        e.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
-                        e.ImageId = 3;
-                        Objects.Add(_currentId, e);
-                        _currentId++;
+                        enemyCount--;
                     }
                 }
             }
         }
 
+        private void UpdateEnemies()
+        {
+            Vector2 playerPosition = LiteralyPlayer.Pos;
+
+            foreach (var obj in Objects)
+            {
+                if (obj.Value is Enemy enemy)
+                {
+                    Vector2 direction = Vector2.Normalize(playerPosition - enemy.Pos);
+                    enemy.Pos += direction * enemy.Speed;
+                }
+            }
+        }
         private void CreateWall()
         {
             for (int y = 0; y < _map.GetLength(1); y++)
@@ -151,7 +181,7 @@ namespace MyRoguelite.Model
 
 
                         LiteralyPlayer = player;
-                        HealthText = player.Health.ToString();
+                        HealthText = "Health "+player.Health.ToString()+"%";
                         LiteralyPlayer.Health = player.Health;
                         isPlacedPlayer = true;
                         break;
@@ -224,6 +254,7 @@ namespace MyRoguelite.Model
             int y = (int)Math.Round(newPos.Y / _tileSizeHeight);
             Collider newCollider = new Collider((int)newPos.X, (int)newPos.Y, (int)p.Size.X, (int)p.Size.Y);
             bool collided = false;
+
             if (playerInitPos != newPos)
             {
                 Dictionary<int, ISolid> solidObjects = Objects.Where(i => i.Value is ISolid)
@@ -231,12 +262,27 @@ namespace MyRoguelite.Model
 
                 foreach (var solidObject in solidObjects)
                 {
-                    if (Collider.IsCollided(newCollider, solidObjects[solidObject.Key].Collider))
+                    Collider collider = solidObjects[solidObject.Key].Collider;
+
+                    if (Collider.IsCollided(newCollider, collider))
                     {
                         collided = true;
-                        Vector2 returnVec = new Vector2(p.Pos.X - (playerInitPos.X + 1), p.Pos.Y - (playerInitPos.Y - 1));
-                        p.Pos = newPos - returnVec;
-                        p.MoveCollider(p.Pos - returnVec);
+
+                        bool collideX = Math.Abs(newPos.X - collider.Boundary.X) < Math.Abs(newPos.Y - collider.Boundary.Y);
+                        bool collideY = !collideX;
+
+                        if (collideX)
+                        {
+                            Vector2 returnVec = new Vector2(p.Pos.X - (playerInitPos.X + 1), p.Pos.Y - (playerInitPos.Y - 1));
+                            p.Pos = new Vector2(newPos.X - returnVec.X, p.Pos.Y);
+                            p.MoveCollider(p.Pos - returnVec);
+                        }
+                        else if (collideY)
+                        {
+                            Vector2 returnVec = new Vector2(p.Pos.X - (playerInitPos.X + 1), p.Pos.Y - (playerInitPos.Y - 1));
+                            p.Pos = new Vector2(p.Pos.X, newPos.Y - returnVec.Y);
+                            p.MoveCollider(p.Pos - returnVec);
+                        }
                     }
                 }
             }

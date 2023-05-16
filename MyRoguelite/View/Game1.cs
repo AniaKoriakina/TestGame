@@ -127,6 +127,7 @@ namespace MyRoguelite.View
                 PlayerMoved.Invoke(this, new ControlsEventArgs { Direction = moveDirection.Item2 });
             }
             else if (isEscPressed) Exit();
+            
 
             _moveSprite.Play(animation);
             _moveSprite.Update(deltaSeconds);
@@ -138,12 +139,13 @@ namespace MyRoguelite.View
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-            _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(800, 400), Color.White);
+            
 
             foreach (var o in _objects.Values)
             {
                 _spriteBatch.Draw(_textures[o.ImageId], o.Pos - _visualShift);
             }
+            _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(50, 20), Color.White);
 
             _spriteBatch.End();
 

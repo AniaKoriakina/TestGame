@@ -7,18 +7,30 @@ using System.Threading.Tasks;
 
 namespace MyRoguelite.Objects
 {
-    public class Enemy : IObject, ISolid
+    public class Enemy : IObject
     {
         public int ImageId { get; set; }
         public Vector2 Pos { get; set; }
         public int Speed { get; set; }
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
-        public Enemy(Vector2 position)
+        public float Health { get; set; }
+        private bool Alive = true;
+        public Enemy(Vector2 position, float health)
         {
             Pos = position;
             Size = new Vector2(135, 137);
             Collider = new Collider((int)Pos.X, (int)Pos.Y, 135, 137);
+            Health = health;
+        }
+        public bool IsDead()
+        {
+            if (Health <= 0)
+            {
+                this.Alive = false;
+                return true;
+            }
+            return false;
         }
 
         public void MoveCollider(Vector2 newPos)
