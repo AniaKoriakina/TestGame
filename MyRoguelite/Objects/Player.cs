@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MyRoguelite.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,15 @@ namespace MyRoguelite.Objects
         public Vector2 Size { get; set; }
         public float Health { get; set; }
         private bool Alive = true;
+        public Dictionary<int, IObject> Objects { get; set; }
 
-
-        public Player(Vector2 position, Vector2 size, int health) 
-        { 
+        public Player(Vector2 position, Vector2 size, int health)
+        {
             Pos = position;
             Collider = new Collider((int)Pos.X, (int)Pos.Y, 135, 137);
             Size = size;
             Health = health;
-        }
+        } 
 
         public bool IsDead()
         {
@@ -44,7 +45,7 @@ namespace MyRoguelite.Objects
 
         public void Update()
         {
-           MoveCollider(Pos);
+            MoveCollider(Pos);
         }
     }
 }

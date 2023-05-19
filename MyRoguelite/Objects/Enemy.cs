@@ -20,7 +20,7 @@ namespace MyRoguelite.Objects
         {
             Pos = position;
             Size = new Vector2(135, 137);
-            Collider = new Collider((int)Pos.X, (int)Pos.Y, 135, 137);
+            Collider = new Collider((int)Pos.X, (int)Pos.Y, (int)Size.X, (int)Size.Y);
             Health = health;
         }
         public bool IsDead()

@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MyRoguelite.Objects;
 using MonoGame.Extended;
+using static MyRoguelite.Model.IModel;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace MyRoguelite.Model
 {
@@ -30,7 +33,12 @@ namespace MyRoguelite.Model
         private Player LiteralyPlayer { get; set; }
         private int enemyCount = 0;
         private int maxEnemyCount = 10;
+
+        private int bulletCount = 0;
+        private int maxBulletCount = 10;
         public static string HealthText { get; set; }
+
+
 
         public void Update()
         {
@@ -57,6 +65,8 @@ namespace MyRoguelite.Model
                 }
             }
 
+
+
             if (LiteralyPlayer.IsDead()) { Environment.Exit(0); }
 
 
@@ -70,9 +80,36 @@ namespace MyRoguelite.Model
             });
 
             UpdateEnemies();
+            UpdateBullets();
+
+
         }
 
+        public void Shoot(Vector2 targetPosition)
+        {
+            Vector2 direction = Vector2.Normalize(targetPosition - LiteralyPlayer.Pos);
+            Bullets bullet = new Bullets(LiteralyPlayer.Pos, direction, 1, 1);
+            bullet.Update();
+            foreach (var obj in Objects)
+            {
+                if (obj.Value is Enemy enemy)
+                {
+                    if (bullet.Collider.Boundary.Intersects(enemy.Collider.Boundary))
+                    {
+                        enemy.Health -= bullet.Damage;
+                        if (enemy.Health <= 0)
+                        {
+                            Objects.Remove(obj.Key);
+                        }
+                    }
+                }
+            }
+        }
 
+        //private bool IsBulletCollidingWithEnemy(Bullets bullet)
+        //{
+
+        //}
 
         public void Initialize()
         {
@@ -103,7 +140,35 @@ namespace MyRoguelite.Model
             {
                 isPlacedPlayer = CleatePlayer(isPlacedPlayer);
             }        
+
         }
+
+        public void CreateBullet(Vector2 playerPosition, Vector2 mousePosition)
+        {
+            Bullets bullets = new Bullets(playerPosition, mousePosition - playerPosition, 1, 1);
+            bullets.ImageId = 4;
+            bullets.Speed = 1;
+            Objects.Add(_currentId, bullets);
+            _currentId++;
+        }
+
+        private void UpdateBullets()
+        {
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                CreateBullet(LiteralyPlayer.Pos, mousePosition);
+            }
+
+            foreach (var obj in Objects)
+            {
+                if (obj.Value is Bullets bullet)
+                {
+                    bullet.Update();
+                }
+            }
+        }
+
 
         private void GenerateEnemies()
         {
@@ -197,7 +262,7 @@ namespace MyRoguelite.Model
             return isPlacedPlayer;
         }
 
-        public void MovePlayer(IModel.Direction dir)
+        public void MovePlayer(Direction dir)
         {
             Player p = LiteralyPlayer;
             Vector2 playerInitPos = p.Pos;
@@ -205,47 +270,47 @@ namespace MyRoguelite.Model
 
             switch (dir)
             {
-                case IModel.Direction.up:
+                case Direction.up:
                     {
                         newPos += new Vector2(0, -p.Speed);
                         break;
                     }
-                case IModel.Direction.down:
+                case Direction.down:
                     {
                         newPos += new Vector2(0, p.Speed);
                         break;
                     }
-                case IModel.Direction.right:
+                case Direction.right:
                     {
                         newPos += new Vector2(p.Speed, 0);
                         break;
                     }
-                case IModel.Direction.left:
+                case Direction.left:
                     {
                         newPos += new Vector2(-p.Speed, 0);
                         break;
                     }
-                case IModel.Direction.upRight:
+                case Direction.upRight:
                     {
                         newPos += new Vector2(p.Speed - 2, -p.Speed + 2);
                         break;
                     }
-                case IModel.Direction.upLeft:
+                case Direction.upLeft:
                     {
                         newPos += new Vector2(-p.Speed + 2, -p.Speed + 2);
                         break;
                     }
-                case IModel.Direction.downRight:
+                case Direction.downRight:
                     {
                         newPos += new Vector2(p.Speed - 2, p.Speed - 2);
                         break;
                     }
-                case IModel.Direction.downLeft:
+                case Direction.downLeft:
                     {
                         newPos += new Vector2(-p.Speed + 2, p.Speed - 2);
                         break;
                     }
-                case IModel.Direction.None:
+                case Direction.None:
                     {
                         break;
                     }
@@ -292,7 +357,7 @@ namespace MyRoguelite.Model
                 p.Pos = newPos;
                 p.MoveCollider(p.Pos);
             }
-
         }
     }
+
 }

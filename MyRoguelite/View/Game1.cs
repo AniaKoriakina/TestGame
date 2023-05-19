@@ -27,6 +27,8 @@ namespace MyRoguelite.View
         private AnimatedSprite _moveSprite;
         private AnimatedSprite _mapFrame;
         private AnimatedSprite _enemySprite;
+        private AnimatedSprite _bulletSprite;
+
 
         private Vector2 _visualShift = new Vector2(0, 0);
 
@@ -41,7 +43,7 @@ namespace MyRoguelite.View
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
@@ -77,6 +79,13 @@ namespace MyRoguelite.View
             _textures.Add(3, _enemySprite);
 
             Font = Content.Load<SpriteFont>("Health");
+
+            var bullet = Content.Load<SpriteSheet>("bulletFrame.sf", new JsonContentLoader());
+            var bulletSprite = new AnimatedSprite(bullet);
+            bulletSprite.Play("bullet");
+            _bulletSprite = bulletSprite;
+            _textures.Add(4, _bulletSprite);
+
 
             //Song backgroundMusic = Content.Load<Song>("backgroundMusic");
             //MediaPlayer.IsRepeating = true;
@@ -146,6 +155,7 @@ namespace MyRoguelite.View
                 _spriteBatch.Draw(_textures[o.ImageId], o.Pos - _visualShift);
             }
             _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(50, 20), Color.White);
+
 
             _spriteBatch.End();
 
