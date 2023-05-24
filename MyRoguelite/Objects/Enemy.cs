@@ -14,9 +14,10 @@ namespace MyRoguelite.Objects
         public int Speed { get; set; }
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
-        public float Health { get; set; }
+        public int Health { get; set; }
+        public string EnemyHealthText { get; set; }
         private bool Alive = true;
-        public Enemy(Vector2 position, float health)
+        public Enemy(Vector2 position, int health)
         {
             Pos = position;
             Size = new Vector2(135, 137);

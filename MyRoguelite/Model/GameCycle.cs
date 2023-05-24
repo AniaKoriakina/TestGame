@@ -33,10 +33,21 @@ namespace MyRoguelite.Model
         private Player LiteralyPlayer { get; set; }
         private int enemyCount = 0;
         private int maxEnemyCount = 10;
+        private int allEnemyKilled = 0;
+
+
 
         private int bulletCount = 0;
         private int maxBulletCount = 10;
+        private bool isBulletSpawned;
+        private List<Bullets> bulletsToRemove = new List<Bullets>();
+        private List<int> enemiesToRemove = new List<int>();
+
         public static string HealthText { get; set; }
+        public static string EnemyCountText { get; set; }
+
+
+        //  public static string EnemyHealthText { get; set; }
 
 
 
@@ -65,6 +76,33 @@ namespace MyRoguelite.Model
                 }
             }
 
+            foreach (var bulletObj in Objects)
+            {
+                if (bulletObj.Value is Bullets bullet)
+                {
+                    foreach (var enemyObj in Objects)
+                    {
+                        if (enemyObj.Value is Enemy enemy)
+                        {
+                            if (Collider.IsCollided(bullet.Collider, enemy.Collider))
+                            {
+                                enemy.Health -= bullet.Damage;
+                                if (enemy.Health <= 0)
+                                {
+                                    Objects.Remove(enemyObj.Key);
+                                    enemy.IsDead();
+                                    enemiesToRemove.Add(enemyObj.Key);
+                                    allEnemyKilled++;
+                                }
+                                Objects.Remove(bulletObj.Key);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+
 
 
             if (LiteralyPlayer.IsDead()) { Environment.Exit(0); }
@@ -81,35 +119,7 @@ namespace MyRoguelite.Model
 
             UpdateEnemies();
             UpdateBullets();
-
-
         }
-
-        public void Shoot(Vector2 targetPosition)
-        {
-            Vector2 direction = Vector2.Normalize(targetPosition - LiteralyPlayer.Pos);
-            Bullets bullet = new Bullets(LiteralyPlayer.Pos, direction, 1, 1);
-            bullet.Update();
-            foreach (var obj in Objects)
-            {
-                if (obj.Value is Enemy enemy)
-                {
-                    if (bullet.Collider.Boundary.Intersects(enemy.Collider.Boundary))
-                    {
-                        enemy.Health -= bullet.Damage;
-                        if (enemy.Health <= 0)
-                        {
-                            Objects.Remove(obj.Key);
-                        }
-                    }
-                }
-            }
-        }
-
-        //private bool IsBulletCollidingWithEnemy(Bullets bullet)
-        //{
-
-        //}
 
         public void Initialize()
         {
@@ -145,61 +155,73 @@ namespace MyRoguelite.Model
 
         public void CreateBullet(Vector2 playerPosition, Vector2 mousePosition)
         {
-            Bullets bullets = new Bullets(playerPosition, mousePosition - playerPosition, 1, 1);
+            Vector2 direction = mousePosition - playerPosition;
+            direction.Normalize();
+            float bulletSpeed = 7f;
+            Vector2 velocity = direction * bulletSpeed;
+            Bullets bullets = new Bullets(playerPosition, velocity, 1, 1);
             bullets.ImageId = 4;
-            bullets.Speed = 1;
             Objects.Add(_currentId, bullets);
             _currentId++;
         }
 
         private void UpdateBullets()
         {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !isBulletSpawned)
             {
                 Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 CreateBullet(LiteralyPlayer.Pos, mousePosition);
+                isBulletSpawned = true; 
+            }
+            else if (Mouse.GetState().LeftButton == ButtonState.Released)
+            {
+                isBulletSpawned = false; 
             }
 
             foreach (var obj in Objects)
             {
                 if (obj.Value is Bullets bullet)
                 {
+
                     bullet.Update();
+
                 }
             }
-        }
 
+        }
 
         private void GenerateEnemies()
         {
             Random random = new Random();
 
-            while (enemyCount < maxEnemyCount)
-            {
-                int x = random.Next(_map.GetLength(0));
-                int y = random.Next(_map.GetLength(1));
+            int x = random.Next(_map.GetLength(0));
+            int y = random.Next(_map.GetLength(1));
 
-                if (_map[x, y] != 'E' && _map[x, y] != 'W' && _map[x, y] != 'P')
+            if (_map[x, y] != 'E' && _map[x, y] != 'W' && _map[x, y] != 'P' )
+            { 
+                Enemy enemy = new Enemy(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2), 2);
+                enemy.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
+                enemy.ImageId = 3;
+                enemy.EnemyHealthText = enemy.Health.ToString();
+                enemy.Speed = 1;
+                enemy.Size = new Vector2(135, 137);
+                EnemyCountText = "Total: " + allEnemyKilled.ToString();
+                Objects.Add(_currentId, enemy);
+                _currentId++;
+                enemyCount++;
+                if (enemy.IsDead())
                 {
-                    Enemy enemy = new Enemy(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2), 100);
-                    enemy.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
-                    enemy.ImageId = 3;
-                    enemy.Speed = 1;
-                    Objects.Add(_currentId, enemy);
-                    _currentId++;
-                    enemyCount++;
-
-                    if (enemy.IsDead())
-                    {
-                        enemyCount--;
-                    }
+                    enemyCount--;
                 }
             }
+
         }
 
         private void UpdateEnemies()
         {
             Vector2 playerPosition = LiteralyPlayer.Pos;
+
+            
 
             foreach (var obj in Objects)
             {
@@ -207,7 +229,33 @@ namespace MyRoguelite.Model
                 {
                     Vector2 direction = Vector2.Normalize(playerPosition - enemy.Pos);
                     enemy.Pos += direction * enemy.Speed;
+
+                    foreach (var otherObj in Objects)
+                    {
+                        if (otherObj.Value is Enemy otherEnemy && enemy != otherEnemy)
+                        {
+                            if (enemy.Collider.Boundary.Intersects(otherEnemy.Collider.Boundary))
+                            {
+                                Vector2 repulsionDirection = Vector2.Normalize(enemy.Pos - otherEnemy.Pos);
+                                float repulsionDistance = 0.1f;
+                                enemy.Pos += repulsionDirection * repulsionDistance;
+                                otherEnemy.Pos -= repulsionDirection * repulsionDistance;
+                            }
+                        }
+                    }
                 }
+            }
+
+            foreach (int enemyId in enemiesToRemove)
+            {
+                Objects.Remove(enemyId);
+                enemyCount--;
+            }
+            enemiesToRemove.Clear();
+
+            if (enemyCount < maxEnemyCount)
+            {
+                GenerateEnemies();
             }
         }
         private void CreateWall()

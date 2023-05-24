@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Content;
+using MonoGame.Extended.Screens;
 using MonoGame.Extended.Serialization;
 using MonoGame.Extended.Sprites;
 using MonoGame.Extended.Timers;
@@ -20,6 +21,7 @@ namespace MyRoguelite.View
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private float currentTime = 0f;
 
         public event EventHandler CycleFinished = delegate { };
         public event EventHandler<ControlsEventArgs> PlayerMoved = delegate { };
@@ -29,6 +31,8 @@ namespace MyRoguelite.View
         private AnimatedSprite _enemySprite;
         private AnimatedSprite _bulletSprite;
 
+        private Texture2D background;
+
 
         private Vector2 _visualShift = new Vector2(0, 0);
 
@@ -36,6 +40,7 @@ namespace MyRoguelite.View
         private Dictionary<int, AnimatedSprite> _textures = new Dictionary<int, AnimatedSprite>();
 
         public static SpriteFont Font { get; set; }
+        public static SpriteFont FontEnemy { get; set; }
 
         public Game1()
         {
@@ -79,12 +84,15 @@ namespace MyRoguelite.View
             _textures.Add(3, _enemySprite);
 
             Font = Content.Load<SpriteFont>("Health");
+            FontEnemy = Content.Load<SpriteFont>("Health");
 
             var bullet = Content.Load<SpriteSheet>("bulletFrame.sf", new JsonContentLoader());
             var bulletSprite = new AnimatedSprite(bullet);
             bulletSprite.Play("bullet");
             _bulletSprite = bulletSprite;
             _textures.Add(4, _bulletSprite);
+
+            background = Content.Load<Texture2D>("background");
 
 
             //Song backgroundMusic = Content.Load<Song>("backgroundMusic");
@@ -104,8 +112,15 @@ namespace MyRoguelite.View
         protected override void Update(GameTime gameTime)
         {
             MovePlayer(gameTime);
+            currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
             base.Update(gameTime);
             CycleFinished.Invoke(this, new EventArgs());
+        }
+        private string DisplayTime()
+        {
+            int minutes = (int)Math.Floor(currentTime / 60f);
+            int seconds = (int)Math.Floor(currentTime % 60f);
+            return string.Format("{0:00}:{1:00}", minutes, seconds);
         }
 
 
@@ -148,13 +163,15 @@ namespace MyRoguelite.View
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-            
+            _spriteBatch.Draw(background, new Vector2(0,0),Color.White);
 
             foreach (var o in _objects.Values)
             {
                 _spriteBatch.Draw(_textures[o.ImageId], o.Pos - _visualShift);
             }
             _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(50, 20), Color.White);
+            _spriteBatch.DrawString(Font, GameCycle.EnemyCountText, new Vector2(400, 20), Color.White);
+            _spriteBatch.DrawString(Font, DisplayTime(), new Vector2(750,20), Color.White);
 
 
             _spriteBatch.End();
