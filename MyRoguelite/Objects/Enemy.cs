@@ -11,18 +11,24 @@ namespace MyRoguelite.Objects
     {
         public int ImageId { get; set; }
         public Vector2 Pos { get; set; }
-        public int Speed { get; set; }
+        public float Speed { get; set; }
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
-        public int Health { get; set; }
+        public float Health { get; set; }
+        public float MaxHealth { get; set; }
+
         public string EnemyHealthText { get; set; }
         private bool Alive = true;
-        public Enemy(Vector2 position, int health)
+
+
+        public Enemy(Vector2 position, float health)
         {
             Pos = position;
             Size = new Vector2(135, 137);
             Collider = new Collider((int)Pos.X, (int)Pos.Y, (int)Size.X, (int)Size.Y);
-            Health = health;
+            MaxHealth = 100f;
+            Health = MaxHealth;
+            
         }
         public bool IsDead()
         {

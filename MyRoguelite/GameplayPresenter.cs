@@ -1,4 +1,5 @@
-﻿using MyRoguelite.Model;
+﻿using Microsoft.Xna.Framework;
+using MyRoguelite.Model;
 using MyRoguelite.View;
 using System;
 using System.Collections.Generic;

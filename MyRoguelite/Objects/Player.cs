@@ -13,7 +13,7 @@ namespace MyRoguelite.Objects
     {
         public int ImageId { get; set; }
         public Vector2 Pos { get; set; }
-        public int Speed { get; set; }
+        public float Speed { get; set; }
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
         public float Health { get; set; }

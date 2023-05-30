@@ -11,7 +11,7 @@ namespace MyRoguelite.Objects
     {
         int ImageId { get; set; }
         Vector2 Pos { get; set; }
-        int Speed { get; set; }
+        float Speed { get; set; }
         void Update();
     }
 }

@@ -37,11 +37,19 @@ namespace MyRoguelite.View
         private Vector2 _visualShift = new Vector2(0, 0);
 
         private Dictionary<int, IObject> _objects = new Dictionary<int, IObject>();
-        private Dictionary<int, AnimatedSprite> _textures = new Dictionary<int, AnimatedSprite>();
+        public Dictionary<int, AnimatedSprite> _textures = new Dictionary<int, AnimatedSprite>();
 
         public static SpriteFont Font { get; set; }
         public static SpriteFont FontEnemy { get; set; }
 
+        GameCycle gameCycle;
+        public static GameTime GameTime { get; private set; }
+
+        public void SetupGame()
+        {
+            Initialize();
+            LoadContent();
+        }
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -57,6 +65,7 @@ namespace MyRoguelite.View
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            gameCycle = new GameCycle();
 
             base.Initialize();
         }
@@ -111,6 +120,9 @@ namespace MyRoguelite.View
 
         protected override void Update(GameTime gameTime)
         {
+
+            Game1.GameTime = gameTime;
+            //gameCycle.Update();
             MovePlayer(gameTime);
             currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
             base.Update(gameTime);
@@ -157,11 +169,15 @@ namespace MyRoguelite.View
             _moveSprite.Update(deltaSeconds);
         }
 
+
+
         protected override void Draw(GameTime gameTime)
         {
             _graphics.GraphicsDevice.Clear(Color.DarkSlateGray);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
+            
 
             _spriteBatch.Draw(background, new Vector2(0,0),Color.White);
 
@@ -170,8 +186,12 @@ namespace MyRoguelite.View
                 _spriteBatch.Draw(_textures[o.ImageId], o.Pos - _visualShift);
             }
             _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(50, 20), Color.White);
-            _spriteBatch.DrawString(Font, GameCycle.EnemyCountText, new Vector2(400, 20), Color.White);
+            if (Font != null && GameCycle.EnemyCountText != null)
+                _spriteBatch.DrawString(Font, GameCycle.EnemyCountText, new Vector2(400, 20), Color.White);
             _spriteBatch.DrawString(Font, DisplayTime(), new Vector2(750,20), Color.White);
+
+            gameCycle.SetObjects(_objects);
+            gameCycle.DrawHealthBars(_spriteBatch);
 
 
             _spriteBatch.End();

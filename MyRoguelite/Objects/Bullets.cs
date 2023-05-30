@@ -14,16 +14,16 @@ namespace MyRoguelite.Objects
         public int Damage { get; set; }
         public int ImageId { get; set; }
         public Vector2 Pos { get; set; }
-        public int Speed { get; set; }
+        public float Speed { get; set; }
         public Vector2 Size { get; set; }
         public Collider Collider { get; set; }
 
-        public Bullets(Vector2 position, Vector2 velocity, int speed, int damage)
+
+        public Bullets(Vector2 position, Vector2 velocity, int speed)
         {
             Pos = position;
             Velocity = velocity;
             Speed = speed;
-            Damage = damage;
             Size = new Vector2(10, 10);
             Collider = new Collider((int)Pos.X, (int)Pos.Y, (int)Size.X, (int)Size.Y);
         }
