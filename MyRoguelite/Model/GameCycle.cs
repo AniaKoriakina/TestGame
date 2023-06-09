@@ -18,6 +18,8 @@ using System.Drawing;
 using Color = Microsoft.Xna.Framework.Color;
 using Point = System.Drawing.Point;
 using MessageBox = System.Windows.Forms.MessageBox;
+using Size = System.Drawing.Size;
+using SharpDX.DirectWrite;
 
 namespace MyRoguelite.Model
 {
@@ -67,6 +69,10 @@ namespace MyRoguelite.Model
             Objects = objects;
         }
 
+        bool isGameOver = false;
+        GameOverState gameOverState = new GameOverState();
+
+
 
 
         public void DrawHealthBars(SpriteBatch spriteBatch)
@@ -86,6 +92,7 @@ namespace MyRoguelite.Model
         }
         public void Update()
         {
+
             var gameTime = Game1.GameTime;
 
             if (!isGamePaused && !isUpgradeWindowActive)
@@ -108,9 +115,9 @@ namespace MyRoguelite.Model
                 TimerForSpawnEnemy(gameTime);
                 ColliderForBulletDamage();
 
-                if (LiteralyPlayer.IsDead())
+                if (LiteralyPlayer.IsDead() && !isGameOver && !isGamePaused)
                 {
-                    Environment.Exit(0);
+                    gameOverState.ShowGameOverForm();
                 }
 
                 var obj2 = new Dictionary<int, IObject>(Objects)
@@ -279,7 +286,8 @@ namespace MyRoguelite.Model
                     if (Collider.IsCollided(LiteralyPlayer.Collider, enemy.Collider))
                     {
                         LiteralyPlayer.Health -= 0.1f;
-                        HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
+                        if (LiteralyPlayer.Health >= 0)
+                            HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
                         if (LiteralyPlayer.Health < 0)
                         {
                             LiteralyPlayer.IsDead();

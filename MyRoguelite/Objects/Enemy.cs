@@ -24,7 +24,9 @@ namespace MyRoguelite.Objects
         {
             Pos = position;
             Size = new Vector2(135, 137);
-            Collider = new Collider((int)Pos.X, (int)Pos.Y, (int)Size.X, (int)Size.Y);
+            float halfWidth = Size.X / 2;
+            float halfHeight = Size.Y / 2;
+            Collider = new Collider((int)(Pos.X - halfWidth), (int)(Pos.Y - halfHeight), (int)Size.X, (int)Size.Y);
             MaxHealth = 100f;
             Health = MaxHealth;
             
@@ -40,14 +42,14 @@ namespace MyRoguelite.Objects
 
         public void MoveCollider(Vector2 newPos)
         {
-            Collider.Boundary = new Rectangle((int)newPos.X, (int)newPos.Y, 135, 137);
+            float halfWidth = Size.X / 2;
+            float halfHeight = Size.Y / 2;
+            Collider.Boundary = new Rectangle((int)(newPos.X - halfWidth), (int)(newPos.Y - halfHeight), (int)Size.X, (int)Size.Y);
         }
 
         public void Update()
         {
             MoveCollider(Pos);
-           
         }
-    } //у меня есть класс enemy, и player, игрок должен сталкиваться с объектом, а не входить в него,
-      //а у меня игрок входит в другой объект
+    } 
 }
