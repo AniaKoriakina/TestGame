@@ -17,7 +17,6 @@ namespace MyRoguelite.Objects
         public Collider Collider { get; set; }
         public Vector2 Size { get; set; }
         public float Health { get; set; }
-        private bool Alive = true;
         public Dictionary<int, IObject> Objects { get; set; }
 
         public Player(Vector2 position, Vector2 size, int health)
@@ -32,7 +31,6 @@ namespace MyRoguelite.Objects
         {
             if (Health <= 0)
             {
-                this.Alive = false;
                 return true;
             }
             return false;

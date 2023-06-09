@@ -67,6 +67,12 @@
 /processorParam:Quality=Best
 /build:backgroundMusic.mp3
 
+#begin backgroundSlow.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:backgroundSlow.wav
+
 #begin Bullet.png
 /importer:TextureImporter
 /processor:TextureProcessor

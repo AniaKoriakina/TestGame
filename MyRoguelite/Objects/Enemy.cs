@@ -18,7 +18,6 @@ namespace MyRoguelite.Objects
         public float MaxHealth { get; set; }
 
         public string EnemyHealthText { get; set; }
-        private bool Alive = true;
 
 
         public Enemy(Vector2 position, float health)
@@ -34,7 +33,6 @@ namespace MyRoguelite.Objects
         {
             if (Health <= 0)
             {
-                this.Alive = false;
                 return true;
             }
             return false;

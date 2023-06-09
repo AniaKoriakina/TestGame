@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -103,10 +104,15 @@ namespace MyRoguelite.View
 
             background = Content.Load<Texture2D>("background");
 
+            //SoundEffect backgroundSlow = Content.Load<SoundEffect>("backgroundSlow");
+            //SoundEffectInstance backgroundSlowInstance = backgroundSlow.CreateInstance();
+            //backgroundSlowInstance.IsLooped = true;
+            //backgroundSlowInstance.Play();
 
-            //Song backgroundMusic = Content.Load<Song>("backgroundMusic");
-            //MediaPlayer.IsRepeating = true;
-            //MediaPlayer.Play(backgroundMusic);
+
+            Song backgroundMusic = Content.Load<Song>("backgroundMusic");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(backgroundMusic);
 
             base.LoadContent();
         }
@@ -169,10 +175,16 @@ namespace MyRoguelite.View
             _moveSprite.Update(deltaSeconds);
         }
 
-
+        private string currentHealthText = "";
+        private string enemyCountText = "";
+        private string currentTimeText = "";
 
         protected override void Draw(GameTime gameTime)
         {
+            currentHealthText = GameCycle.HealthText;
+            enemyCountText = GameCycle.EnemyCountText;
+            currentTimeText = DisplayTime();
+
             _graphics.GraphicsDevice.Clear(Color.DarkSlateGray);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -185,10 +197,10 @@ namespace MyRoguelite.View
             {
                 _spriteBatch.Draw(_textures[o.ImageId], o.Pos - _visualShift);
             }
-            _spriteBatch.DrawString(Font, GameCycle.HealthText, new Vector2(50, 20), Color.White);
-            if (Font != null && GameCycle.EnemyCountText != null)
-                _spriteBatch.DrawString(Font, GameCycle.EnemyCountText, new Vector2(400, 20), Color.White);
-            _spriteBatch.DrawString(Font, DisplayTime(), new Vector2(750,20), Color.White);
+            _spriteBatch.DrawString(Font, currentHealthText, new Vector2(50, 20), Color.White);
+            if (Font != null && enemyCountText != null)
+                _spriteBatch.DrawString(Font, enemyCountText, new Vector2(400, 20), Color.White);
+            _spriteBatch.DrawString(Font, currentTimeText, new Vector2(750, 20), Color.White);
 
             gameCycle.SetObjects(_objects);
             gameCycle.DrawHealthBars(_spriteBatch);

@@ -12,48 +12,55 @@ using static MyRoguelite.Model.IModel;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MyRoguelite.View;
+using System.Windows.Forms;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using System.Drawing;
+using Color = Microsoft.Xna.Framework.Color;
+using Point = System.Drawing.Point;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace MyRoguelite.Model
 {
     public class GameCycle : IModel
     {
         private int _currentId;
-
-
         private int _tileSizeWidth = 137;
         private int _tileSizeHeight = 135;
-
-        public event EventHandler<GameplayEventArgs> Updated = delegate { };
-
-        //    private static Vector2 _pos = new Vector2(900, 500);
-        public int PlayerId { get; set; }
-        private char[,] _map = new char[14, 8];
-
-        public Dictionary<int, IObject> Objects { get; set; }
-
-        public Player LiteralyPlayer { get; set; }
         private int enemyCount = 0;
-        private int maxEnemyCount = 10;
         private int allEnemyKilled = 0;
-
-        private bool isBulletSpawned;
-        private List<int> enemiesToRemove = new List<int>();
-
-        public static string HealthText { get; set; }
-        public static string EnemyCountText { get; set; }
 
         private float enemySpawnTimer = 0f;
         private static float baseEnemySpawnInterval = 3f;
         private float enemySpawnInterval = baseEnemySpawnInterval;
         private float elapsedSeconds = 0f;
         private float intervalChangeTime = 30f;
+
+        private bool isBulletSpawned;
         private bool hasIntervalChanged = false;
-
         private bool isGamePaused = false;
-        public static bool upgradeDamageApplied = false;
         private bool isUpgradeWindowActive = false;
+        private bool isUpgradeWindowShown = false;
+        private static bool upgradeDamageApplied = false;
 
-        private int baseBulletDamage = 10;
+        private char[,] _map = new char[14, 8];
+
+        public int PlayerId { get; set; }
+        public static string HealthText { get; set; }
+        public static string EnemyCountText { get; set; }
+
+        public Player LiteralyPlayer { get; set; }
+        public Dictionary<int, IObject> Objects { get; set; }
+        private List<int> enemiesToRemove = new List<int>();
+
+        private TimeSpan elapsedTime = TimeSpan.Zero;
+        private TimeSpan pausedTime = TimeSpan.Zero;
+
+        public static GameCycle gameCycle = new GameCycle();
+
+        public event EventHandler<GameplayEventArgs> Updated = delegate { };
+
+        private int baseBulletDamage = 7;
+        public bool IsGamePaused { get { return isGamePaused; } }
 
         public void SetObjects(Dictionary<int, IObject> objects)
         {
@@ -61,22 +68,22 @@ namespace MyRoguelite.Model
         }
 
 
+
         public void DrawHealthBars(SpriteBatch spriteBatch)
         {
-                foreach (var obj in Objects)
+            foreach (var obj in Objects)
+            {
+                if (obj.Value is Enemy enemy)
                 {
-                    if (obj.Value is Enemy enemy)
-                    {
-                        var healthBarPosition = enemy.Pos - new Vector2(30, 60);
-                        var healthBarWidth = 50f;
-                        var healthBarHeight = 5f;
-                        var healthBarFillWidth = healthBarWidth * (enemy.Health / enemy.MaxHealth);
-                        spriteBatch.DrawRectangle(healthBarPosition, new Vector2(healthBarWidth, healthBarHeight), Color.Black);
-                        spriteBatch.DrawRectangle(healthBarPosition, new Vector2(healthBarFillWidth, healthBarHeight), Color.Red);
-                    }
+                    var healthBarPosition = enemy.Pos - new Vector2(30, 60);
+                    var healthBarWidth = 50f;
+                    var healthBarHeight = 5f;
+                    var healthBarFillWidth = healthBarWidth * (enemy.Health / enemy.MaxHealth);
+                    spriteBatch.DrawRectangle(healthBarPosition, new Vector2(healthBarWidth, healthBarHeight), Color.Black);
+                    spriteBatch.DrawRectangle(healthBarPosition, new Vector2(healthBarFillWidth, healthBarHeight), Color.Red);
                 }
+            }
         }
-
         public void Update()
         {
             var gameTime = Game1.GameTime;
@@ -85,81 +92,125 @@ namespace MyRoguelite.Model
             {
                 elapsedTime += gameTime.ElapsedGameTime;
             }
+
             foreach (var obj in Objects)
             {
-                Objects[obj.Key].Update();
+                if (!isUpgradeWindowActive)
+                {
+                    Objects[obj.Key].Update();
+                }
             }
 
-            LiteralyPlayer.Update();
-
-            ColliderForHealthDown();
-
-            TimerForSpawnEnemy(gameTime);
-
-            ColliderForBulletDamage();
-
-            if (LiteralyPlayer.IsDead()) { Environment.Exit(0); }
-
-            var obj2 = new Dictionary<int, IObject>(Objects)
+            if (!isUpgradeWindowActive)
             {
-                 { PlayerId, LiteralyPlayer }
-            };
+                LiteralyPlayer.Update();
+                ColliderForHealthDown();
+                TimerForSpawnEnemy(gameTime);
+                ColliderForBulletDamage();
 
-            Updated.Invoke(this, new GameplayEventArgs
-            {
-                Objects = obj2,
-            });
+                if (LiteralyPlayer.IsDead())
+                {
+                    Environment.Exit(0);
+                }
 
-            if (isUpgradeWindowActive)
+                var obj2 = new Dictionary<int, IObject>(Objects)
+                {
+                    { PlayerId, LiteralyPlayer }
+                };
+
+                Updated.Invoke(this, new GameplayEventArgs
+                {
+                    Objects = obj2,
+                });
+            }
+
+            if (!isUpgradeWindowShown && isUpgradeWindowActive)
             {
+                isUpgradeWindowShown = true;
                 ShowUpgradeWindow();
             }
-            else
+            else if (!isUpgradeWindowActive)
             {
                 UpdateEnemies();
                 UpdateBullets();
+            }
+
+            if (isGamePaused)
+            {
+                return;
             }
         }
 
         private void ShowUpgradeWindow()
         {
-            Console.WriteLine("=== Окно Апгрейда ===");
-            Console.WriteLine("Выберите апгрейд:");
-            Console.WriteLine("1. Повысить MaxHealth");
-            Console.WriteLine("2. Повысить Speed");
-            Console.WriteLine("3. Повысить Damage");
-            string input = Console.ReadLine();
-            int upgradeChoice;
-            if (int.TryParse(input, out upgradeChoice))
+
+            isUpgradeWindowActive = true;
+            Form upgradeForm = new Form();
+            upgradeForm.Text = "Окно Апгрейда";
+
+            Label label = new Label();
+            label.Text = "Апгрейд:";
+            label.Location = new System.Drawing.Point(50, 10);
+            upgradeForm.Controls.Add(label);
+
+            Button button1 = new Button();
+            button1.Text = "MaxHealth";
+            button1.Location = new System.Drawing.Point(10, 40);
+            button1.Click += (sender, e) =>
             {
-                switch (upgradeChoice)
-                {
-                    case 1:
-                        UpgradeHealth();
-                        isUpgradeWindowActive = false; 
-                        isGamePaused = false;
-                        break;
-                    case 2:
-                        UpgradeSpeed();
-                        isUpgradeWindowActive = false; 
-                        isGamePaused = false;
-                        break;
-                    case 3:
-                        baseBulletDamage += 100;
-                        upgradeDamageApplied = true;
-                        isUpgradeWindowActive = false;
-                        isGamePaused = false;
-                        break;
-                    default:
-                        Console.WriteLine("Неверный ввод");
-                        break;
-                }
-            }
-            if (allEnemyKilled % 10 == 0)
-            {
+                UpgradeHealth();
                 isUpgradeWindowActive = false;
                 isGamePaused = false;
-            }
+                upgradeForm.Close();
+            };
+            upgradeForm.Controls.Add(button1);
+
+            Button button2 = new Button();
+            button2.Text = "Speed";
+            button2.Location = new System.Drawing.Point(10, 70);
+            button2.Click += (sender, e) =>
+            {
+                UpgradeSpeed();
+                isUpgradeWindowActive = false;
+                isGamePaused = false;
+                upgradeForm.Close();
+            };
+            upgradeForm.Controls.Add(button2);
+
+            Button button3 = new Button();
+            button3.Text = "Damage";
+            button3.Location = new System.Drawing.Point(10, 100);
+            button3.Click += (sender, e) =>
+            {
+                baseBulletDamage += 2;
+                upgradeDamageApplied = true;
+                isUpgradeWindowActive = false;
+                isGamePaused = false;
+                upgradeForm.Close();
+            };
+            upgradeForm.Controls.Add(button3);
+
+            Button button4 = new Button();
+            button4.Text = "FullHealth";
+            button4.Location = new System.Drawing.Point(10, 130);
+            button4.Click += (sender, e) =>
+            {
+                UpgradeFullHealth();
+                upgradeDamageApplied = true;
+                isUpgradeWindowActive = false;
+                isGamePaused = false;
+                upgradeForm.Close();
+            };
+            upgradeForm.Controls.Add(button4);
+
+            upgradeForm.FormClosed += (sender, e) =>
+            {
+                isUpgradeWindowShown = false;
+                isUpgradeWindowActive = false;
+                isGamePaused = true;
+            };
+
+            upgradeForm.ShowDialog();
         }
 
         private void ColliderForBulletDamage()
@@ -182,7 +233,12 @@ namespace MyRoguelite.Model
                                     enemy.IsDead();
                                     enemiesToRemove.Add(enemyObj.Key);
                                     allEnemyKilled++;
-                                    if (allEnemyKilled % 10 == 0 && !isUpgradeWindowActive)
+                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
+                                    {
+                                        isUpgradeWindowActive = true;
+                                        isGamePaused = true;
+                                    }
+                                    if (allEnemyKilled >= 20 && allEnemyKilled % 10 == 0 && !isUpgradeWindowActive)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
@@ -196,14 +252,22 @@ namespace MyRoguelite.Model
                 }
             }
         }
+        private float maxHealth;
 
         public void UpgradeHealth()
         {
             LiteralyPlayer.Health += 10;
+            maxHealth +=10;
         }
+
+        public void UpgradeFullHealth()
+        {
+            LiteralyPlayer.Health = maxHealth;
+        }
+
         public void UpgradeSpeed()
         {
-            LiteralyPlayer.Speed += 0.1f;
+            LiteralyPlayer.Speed += 0.3f;
         }
 
         private void ColliderForHealthDown()
@@ -241,7 +305,7 @@ namespace MyRoguelite.Model
                 enemySpawnTimer = 0f;
                 GenerateEnemies();
             }
-        }//интервал появления врагов
+        }
 
         public void Initialize()
         {
@@ -265,7 +329,7 @@ namespace MyRoguelite.Model
             if (!isPlacedPlayer)
             {
                 isPlacedPlayer = CleatePlayer(isPlacedPlayer);
-            }        
+            }
 
         }
 
@@ -290,11 +354,11 @@ namespace MyRoguelite.Model
             {
                 Vector2 mousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 CreateBullet(LiteralyPlayer.Pos, mousePosition);
-                isBulletSpawned = true; 
+                isBulletSpawned = true;
             }
             else if (Mouse.GetState().LeftButton == ButtonState.Released)
             {
-                isBulletSpawned = false; 
+                isBulletSpawned = false;
             }
 
             foreach (var obj in Objects)
@@ -314,8 +378,8 @@ namespace MyRoguelite.Model
             int x = random.Next(_map.GetLength(0));
             int y = random.Next(_map.GetLength(1));
 
-            if (_map[x, y] != 'E' && _map[x, y] != 'W' && _map[x, y] != 'P' )
-            { 
+            if (_map[x, y] != 'E' && _map[x, y] != 'W' && _map[x, y] != 'P')
+            {
                 Enemy enemy = new Enemy(new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2), 2);
                 enemy.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2, y * _tileSizeHeight + _tileSizeHeight / 2);
                 enemy.ImageId = 3;
@@ -338,7 +402,7 @@ namespace MyRoguelite.Model
         {
             Vector2 playerPosition = LiteralyPlayer.Pos;
 
-            
+
 
             foreach (var obj in Objects)
             {
@@ -384,7 +448,7 @@ namespace MyRoguelite.Model
                 {
                     if (_map[x, y] == 'W')
                     {
-                        Wall w = new Wall(new Vector2(135,137));
+                        Wall w = new Wall(new Vector2(135, 137));
                         w.Pos = new Vector2(x * _tileSizeWidth + _tileSizeWidth / 2 + 2, y * _tileSizeHeight + _tileSizeHeight / 2 + 2);
                         w.ImageId = 2;
                         Objects.Add(_currentId, w);
@@ -412,8 +476,9 @@ namespace MyRoguelite.Model
 
 
                         LiteralyPlayer = player;
-                        HealthText = "Health "+player.Health.ToString()+"%";
+                        HealthText = "Health " + player.Health.ToString() + "%";
                         LiteralyPlayer.Health = player.Health;
+                        maxHealth = LiteralyPlayer.Health;
                         isPlacedPlayer = true;
                         break;
                     }
