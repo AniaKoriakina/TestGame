@@ -25,7 +25,7 @@ namespace MyRoguelite.Objects
             Pos = position;
             Size = new Vector2(135, 137);
             float halfWidth = Size.X / 2;
-            float halfHeight = Size.Y / 2;
+            float halfHeight = Size.Y / 6;
             Collider = new Collider((int)(Pos.X - halfWidth), (int)(Pos.Y - halfHeight), (int)Size.X, (int)Size.Y);
             MaxHealth = 100f;
             Health = MaxHealth;
@@ -43,7 +43,7 @@ namespace MyRoguelite.Objects
         public void MoveCollider(Vector2 newPos)
         {
             float halfWidth = Size.X / 2;
-            float halfHeight = Size.Y / 2;
+            float halfHeight = Size.Y / 6;
             Collider.Boundary = new Rectangle((int)(newPos.X - halfWidth), (int)(newPos.Y - halfHeight), (int)Size.X, (int)Size.Y);
         }
 

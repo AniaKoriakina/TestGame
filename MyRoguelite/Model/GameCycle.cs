@@ -54,8 +54,11 @@ namespace MyRoguelite.Model
         public Dictionary<int, IObject> Objects { get; set; }
         private List<int> enemiesToRemove = new List<int>();
 
-        private TimeSpan elapsedTime = TimeSpan.Zero;
-        private TimeSpan pausedTime = TimeSpan.Zero;
+        TimeSpan gameDuration = TimeSpan.Zero;
+
+        private double elapsedTime = 0;
+        private double speedIncreaseInterval = 120000;
+        private float speedIncreaseAmount = 2;
 
         public static GameCycle gameCycle = new GameCycle();
 
@@ -97,7 +100,16 @@ namespace MyRoguelite.Model
 
             if (!isGamePaused && !isUpgradeWindowActive)
             {
-                elapsedTime += gameTime.ElapsedGameTime;
+                elapsedTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+            }
+
+            gameDuration += gameTime.ElapsedGameTime;
+            TimeSpan tenMinutes = TimeSpan.FromMinutes(15);
+
+            if (gameDuration >= tenMinutes)
+            {
+                ShowVictoryWindow(); 
+                isGamePaused = true; 
             }
 
             foreach (var obj in Objects)
@@ -110,26 +122,28 @@ namespace MyRoguelite.Model
 
             if (!isUpgradeWindowActive)
             {
-                LiteralyPlayer.Update();
-                ColliderForHealthDown();
                 TimerForSpawnEnemy(gameTime);
-                ColliderForBulletDamage();
-
-                if (LiteralyPlayer.IsDead() && !isGameOver && !isGamePaused)
-                {
-                    gameOverState.ShowGameOverForm();
-                }
-
-                var obj2 = new Dictionary<int, IObject>(Objects)
-                {
-                    { PlayerId, LiteralyPlayer }
-                };
-
-                Updated.Invoke(this, new GameplayEventArgs
-                {
-                    Objects = obj2,
-                });
+                ColliderForHealthDown();
             }
+
+            LiteralyPlayer.Update();
+            ColliderForBulletDamage();
+
+            if (LiteralyPlayer.IsDead() && !isGameOver && !isGamePaused)
+            {
+                gameOverState.ShowGameOverForm();
+            }
+
+            var obj2 = new Dictionary<int, IObject>(Objects)
+            {
+                { PlayerId, LiteralyPlayer }
+            };
+
+            Updated.Invoke(this, new GameplayEventArgs
+            {
+                Objects = obj2,
+            });
+            
 
             if (!isUpgradeWindowShown && isUpgradeWindowActive)
             {
@@ -148,11 +162,25 @@ namespace MyRoguelite.Model
             }
         }
 
+        private void ShowVictoryWindow()
+        {
+            MessageBox.Show("Вы победили!", "Победа", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Environment.Exit(0);
+        }
+
         private void ShowUpgradeWindow()
         {
-
             isUpgradeWindowActive = true;
+            isGamePaused = true;
             Form upgradeForm = new Form();
+
+            upgradeForm.FormBorderStyle = FormBorderStyle.None;
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+            upgradeForm.StartPosition = FormStartPosition.Manual;
+            upgradeForm.Left = (screenWidth - upgradeForm.Width) / 2;
+            upgradeForm.Top = (screenHeight - upgradeForm.Height) / 2;
+
             upgradeForm.Text = "Окно Апгрейда";
 
             Label label = new Label();
@@ -240,7 +268,8 @@ namespace MyRoguelite.Model
                                     enemy.IsDead();
                                     enemiesToRemove.Add(enemyObj.Key);
                                     allEnemyKilled++;
-                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
+                                    UpdateEnemyCountText();
+                                    if (allEnemyKilled % 6 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
@@ -259,23 +288,35 @@ namespace MyRoguelite.Model
                 }
             }
         }
+
         private float maxHealth;
 
         public void UpgradeHealth()
         {
             LiteralyPlayer.Health += 10;
-            maxHealth +=10;
+            maxHealth += 10;
+            UpdateHealthText();
         }
 
         public void UpgradeFullHealth()
         {
             LiteralyPlayer.Health = maxHealth;
+            UpdateHealthText(); 
+        }
+
+        private void UpdateHealthText()
+        {
+            if (LiteralyPlayer.Health >= 0)
+                HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
+            else
+                HealthText = "Health 0%";
         }
 
         public void UpgradeSpeed()
         {
             LiteralyPlayer.Speed += 0.3f;
         }
+
 
         private void ColliderForHealthDown()
         {
@@ -285,12 +326,16 @@ namespace MyRoguelite.Model
                 {
                     if (Collider.IsCollided(LiteralyPlayer.Collider, enemy.Collider))
                     {
-                        LiteralyPlayer.Health -= 0.1f;
-                        if (LiteralyPlayer.Health >= 0)
-                            HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
+                        float healthBefore = LiteralyPlayer.Health;
+                        LiteralyPlayer.Health -= 0.3f;
                         if (LiteralyPlayer.Health < 0)
                         {
                             LiteralyPlayer.IsDead();
+                        }
+                        if (LiteralyPlayer.Health != healthBefore)
+                        {
+                            if (LiteralyPlayer.Health >= 0)
+                                HealthText = "Health " + Math.Round(LiteralyPlayer.Health).ToString() + "%";
                         }
                     }
                 }
@@ -340,6 +385,9 @@ namespace MyRoguelite.Model
             }
 
         }
+
+
+
 
         public void CreateBullet(Vector2 playerPosition, Vector2 mousePosition)
         {
@@ -393,8 +441,13 @@ namespace MyRoguelite.Model
                 enemy.ImageId = 3;
                 enemy.EnemyHealthText = enemy.Health.ToString();
                 enemy.Speed = 1;
+
+                if (elapsedTime >= speedIncreaseInterval)
+                {
+                    enemy.Speed += speedIncreaseAmount;
+                }
                 enemy.Size = new Vector2(135, 137);
-                EnemyCountText = "Total: " + allEnemyKilled.ToString();
+                
                 Objects.Add(_currentId, enemy);
                 _currentId++;
                 enemyCount++;
@@ -404,6 +457,11 @@ namespace MyRoguelite.Model
                 }
             }
 
+        }
+
+        private void UpdateEnemyCountText()
+        {
+            EnemyCountText = "Total: " + allEnemyKilled.ToString();
         }
 
         private void UpdateEnemies()
