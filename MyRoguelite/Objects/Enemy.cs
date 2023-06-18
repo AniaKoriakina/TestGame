@@ -23,12 +23,13 @@ namespace MyRoguelite.Objects
         public Enemy(Vector2 position, float health)
         {
             Pos = position;
-            Size = new Vector2(135, 137);
+            Size = new Vector2(135, 50);
             float halfWidth = Size.X / 2;
-            float halfHeight = Size.Y / 6;
-            Collider = new Collider((int)(Pos.X - halfWidth), (int)(Pos.Y - halfHeight), (int)Size.X, (int)Size.Y);
+            float halfHeight = Size.Y / 2;
+            Collider = new Collider((int)(Pos.X + halfWidth - Size.X / 2), (int)(Pos.Y + halfHeight - Size.Y / 2), (int)Size.X, (int)Size.Y);
             MaxHealth = 100f;
             Health = MaxHealth;
+            MoveCollider(Pos);
             
         }
         public bool IsDead()
@@ -43,8 +44,8 @@ namespace MyRoguelite.Objects
         public void MoveCollider(Vector2 newPos)
         {
             float halfWidth = Size.X / 2;
-            float halfHeight = Size.Y / 6;
-            Collider.Boundary = new Rectangle((int)(newPos.X - halfWidth), (int)(newPos.Y - halfHeight), (int)Size.X, (int)Size.Y);
+            float halfHeight = Size.Y / 2; 
+            Collider.Boundary = new Rectangle((int)(newPos.X + halfWidth - Size.X / 2), (int)(newPos.Y + halfHeight - Size.Y / 2), (int)Size.X, (int)Size.Y);
         }
 
         public void Update()

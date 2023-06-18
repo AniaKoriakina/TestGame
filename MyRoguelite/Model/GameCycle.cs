@@ -72,6 +72,7 @@ namespace MyRoguelite.Model
             Objects = objects;
         }
 
+        bool canPlayerMoveAndShoot = true;
         bool isGameOver = false;
         GameOverState gameOverState = new GameOverState();
 
@@ -131,6 +132,7 @@ namespace MyRoguelite.Model
 
             if (LiteralyPlayer.IsDead() && !isGameOver && !isGamePaused)
             {
+                canPlayerMoveAndShoot = false;
                 gameOverState.ShowGameOverForm();
             }
 

@@ -42,7 +42,7 @@ public class GameOverState
         if (!gameOverForm.Visible)
         {
             isGameOver = true;
-            gameOverForm.Visible = true;
+            gameOverForm.ShowDialog();
         }
     }
 
