@@ -22,7 +22,9 @@ namespace MyRoguelite.Objects
         public Player(Vector2 position, Vector2 size, int health)
         {
             Pos = position;
-            Collider = new Collider((int)Pos.X, (int)Pos.Y, 135, 137);
+            float halfWidth = Size.X / 2;
+            float halfHeight = Size.Y / 2;
+            Collider = new Collider((int)(Pos.X - halfWidth), (int)(Pos.Y - halfHeight), 135, 137);
             Size = size;
             Health = health;
         } 
@@ -38,7 +40,9 @@ namespace MyRoguelite.Objects
 
         public void MoveCollider(Vector2 newPos)
         {
-            Collider.Boundary = new Rectangle((int)newPos.X, (int)newPos.Y, (int)Size.X, (int)Size.Y);
+            float halfWidth = Size.X / 2;
+            float halfHeight = Size.Y / 2;
+            Collider.Boundary = new Rectangle((int)(Pos.X - halfWidth), (int)(Pos.Y - halfHeight), 135, 137);
         }
 
         public void Update()

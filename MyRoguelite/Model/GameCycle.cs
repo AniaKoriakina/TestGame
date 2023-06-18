@@ -271,7 +271,7 @@ namespace MyRoguelite.Model
                                     enemiesToRemove.Add(enemyObj.Key);
                                     allEnemyKilled++;
                                     UpdateEnemyCountText();
-                                    if (allEnemyKilled % 6 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
+                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
