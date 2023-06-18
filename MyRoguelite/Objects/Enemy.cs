@@ -23,14 +23,12 @@ namespace MyRoguelite.Objects
         public Enemy(Vector2 position, float health)
         {
             Pos = position;
-            Size = new Vector2(135, 50);
+            Size = new Vector2(135, 137);
             float halfWidth = Size.X / 2;
             float halfHeight = Size.Y / 2;
             Collider = new Collider((int)(Pos.X + halfWidth - Size.X / 2), (int)(Pos.Y + halfHeight - Size.Y / 2), (int)Size.X, (int)Size.Y);
             MaxHealth = 100f;
-            Health = MaxHealth;
-            MoveCollider(Pos);
-            
+            Health = MaxHealth;    
         }
         public bool IsDead()
         {

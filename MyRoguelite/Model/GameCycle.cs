@@ -105,7 +105,7 @@ namespace MyRoguelite.Model
             }
 
             gameDuration += gameTime.ElapsedGameTime;
-            TimeSpan tenMinutes = TimeSpan.FromMinutes(15);
+            TimeSpan tenMinutes = TimeSpan.FromMinutes(10);
 
             if (gameDuration >= tenMinutes)
             {
