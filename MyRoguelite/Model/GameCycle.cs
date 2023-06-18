@@ -57,7 +57,7 @@ namespace MyRoguelite.Model
         TimeSpan gameDuration = TimeSpan.Zero;
 
         private double elapsedTime = 0;
-        private double speedIncreaseInterval = 20000;
+        private double speedIncreaseInterval = 120000;
         private float speedIncreaseAmount = 2;
 
         public static GameCycle gameCycle = new GameCycle();
@@ -271,12 +271,12 @@ namespace MyRoguelite.Model
                                     enemiesToRemove.Add(enemyObj.Key);
                                     allEnemyKilled++;
                                     UpdateEnemyCountText();
-                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 30)
+                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 46)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
                                     }
-                                    if (allEnemyKilled >= 20 && allEnemyKilled % 10 == 0 && !isUpgradeWindowActive)
+                                    if (allEnemyKilled >= 46 && allEnemyKilled % 10 == 0 && !isUpgradeWindowActive)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
