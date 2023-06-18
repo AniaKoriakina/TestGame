@@ -57,7 +57,7 @@ namespace MyRoguelite.Model
         TimeSpan gameDuration = TimeSpan.Zero;
 
         private double elapsedTime = 0;
-        private double speedIncreaseInterval = 10000;
+        private double speedIncreaseInterval = 20000;
         private float speedIncreaseAmount = 2;
 
         public static GameCycle gameCycle = new GameCycle();
@@ -105,9 +105,9 @@ namespace MyRoguelite.Model
             }
 
             gameDuration += gameTime.ElapsedGameTime;
-            TimeSpan tenMinutes = TimeSpan.FromMinutes(10);
+            TimeSpan fiveMinutes = TimeSpan.FromMinutes(5);
 
-            if (gameDuration >= tenMinutes)
+            if (gameDuration >= fiveMinutes)
             {
                 ShowVictoryWindow(); 
                 isGamePaused = true; 
@@ -271,7 +271,7 @@ namespace MyRoguelite.Model
                                     enemiesToRemove.Add(enemyObj.Key);
                                     allEnemyKilled++;
                                     UpdateEnemyCountText();
-                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 20)
+                                    if (allEnemyKilled % 5 == 0 && !isUpgradeWindowActive && allEnemyKilled < 30)
                                     {
                                         isUpgradeWindowActive = true;
                                         isGamePaused = true;
@@ -329,7 +329,7 @@ namespace MyRoguelite.Model
                     if (Collider.IsCollided(LiteralyPlayer.Collider, enemy.Collider))
                     {
                         float healthBefore = LiteralyPlayer.Health;
-                        LiteralyPlayer.Health -= 0.3f;
+                        LiteralyPlayer.Health -= 0.09f;
                         if (LiteralyPlayer.Health < 0)
                         {
                             LiteralyPlayer.IsDead();
