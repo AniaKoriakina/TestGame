@@ -130,7 +130,7 @@ namespace MyRoguelite.Model
             LiteralyPlayer.Update();
             ColliderForBulletDamage();
 
-            if (LiteralyPlayer.IsDead() && !isGameOver && !isGamePaused)
+            if (LiteralyPlayer.IsDead() && !isGameOver)
             {
                 canPlayerMoveAndShoot = false;
                 gameOverState.ShowGameOverForm();
