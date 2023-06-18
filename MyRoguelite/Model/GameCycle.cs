@@ -57,14 +57,14 @@ namespace MyRoguelite.Model
         TimeSpan gameDuration = TimeSpan.Zero;
 
         private double elapsedTime = 0;
-        private double speedIncreaseInterval = 120000;
+        private double speedIncreaseInterval = 10000;
         private float speedIncreaseAmount = 2;
 
         public static GameCycle gameCycle = new GameCycle();
 
         public event EventHandler<GameplayEventArgs> Updated = delegate { };
 
-        private int baseBulletDamage = 7;
+        private int baseBulletDamage = 6;
         public bool IsGamePaused { get { return isGamePaused; } }
 
         public void SetObjects(Dictionary<int, IObject> objects)
@@ -219,7 +219,7 @@ namespace MyRoguelite.Model
             button3.Location = new System.Drawing.Point(10, 100);
             button3.Click += (sender, e) =>
             {
-                baseBulletDamage += 2;
+                baseBulletDamage += 1;
                 upgradeDamageApplied = true;
                 isUpgradeWindowActive = false;
                 isGamePaused = false;
