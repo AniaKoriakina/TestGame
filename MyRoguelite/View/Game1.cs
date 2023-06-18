@@ -14,7 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Input;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Screen = System.Windows.Forms.Screen;
 
 namespace MyRoguelite.View
 {
@@ -58,8 +61,10 @@ namespace MyRoguelite.View
             IsMouseVisible = true;
 
             _graphics.IsFullScreen = false;
-            _graphics.PreferredBackBufferWidth = 1920;
-            _graphics.PreferredBackBufferHeight = 1080;
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+            _graphics.PreferredBackBufferWidth = screenWidth;
+            _graphics.PreferredBackBufferHeight = screenHeight;
             _graphics.ApplyChanges();
         }
 
